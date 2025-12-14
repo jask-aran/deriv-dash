@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
+import logging
+import os
+
 import pandas as pd
 import yfinance as yf
 import yfinance.data
 
-# Patch yfinance to bypass fc.yahoo.com check which is blocked in some environments
-def _get_cookie_basic_patched(self, timeout=30):
-    return True
+logger = logging.getLogger(__name__)
 
-yfinance.data.YfData._get_cookie_basic = _get_cookie_basic_patched
+# Patch yfinance to bypass fc.yahoo.com check if requested via env var
+if os.getenv("YFINANCE_SKIP_COOKIE_CHECK", "0").lower() in ("1", "true", "yes"):
+    logger.warning("Patching yfinance to skip fc.yahoo.com cookie check (YFINANCE_SKIP_COOKIE_CHECK is set)")
+
+    def _get_cookie_basic_patched(self, timeout=30):
+        return True
+
+    yfinance.data.YfData._get_cookie_basic = _get_cookie_basic_patched
 
 from ..domain import PriceQuery
 from ..utils import DataRetrievalError
