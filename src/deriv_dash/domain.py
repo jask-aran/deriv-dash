@@ -14,8 +14,9 @@ class PriceQuery:
     tickers: list[str]
     start: date
     end: date
-    interval: Literal["1d"] = "1d"
+    interval: str = "1d"
     auto_adjust: bool = False
+    include_extended: bool = False
 
 
 @dataclass(slots=True)
@@ -24,6 +25,7 @@ class DashboardState:
     normalize: bool = False
     log_scale: bool = False
     show_table: bool = True
+    include_extended: bool = False
 
 
 # Backwards-friendly alias

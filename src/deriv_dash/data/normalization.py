@@ -31,7 +31,7 @@ def normalize_yfinance_frame(raw: pd.DataFrame, tickers: Iterable[str]) -> pd.Da
         inferred_ticker = tickers_list[0] if tickers_list else "TICKER"
         normalized = _normalize_single_ticker(df, inferred_ticker)
 
-    normalized["date"] = pd.to_datetime(normalized["date"]).dt.normalize()
+    normalized["date"] = pd.to_datetime(normalized["date"])
 
     return normalized.sort_values(["ticker", "date"]).reset_index(drop=True)
 
@@ -77,13 +77,16 @@ def _normalize_single_ticker(frame: pd.DataFrame, ticker: str) -> pd.DataFrame:
     ordered_cols = [col for col in ("close", "adj_close", "volume") if col in working.columns]
     working = working[ordered_cols]
 
-    working = working.reset_index().rename(columns={"Date": "date", "index": "date"})
+    working = working.reset_index().rename(columns={"Date": "date", "Datetime": "date", "index": "date"})
     if "date" not in working.columns:
         working["date"] = working.index
 
     for missing in ("close", "adj_close", "volume"):
         if missing not in working.columns:
-            working[missing] = pd.NA
+            if missing == "adj_close" and "close" in working.columns:
+                working["adj_close"] = working["close"]
+            else:
+                working[missing] = pd.NA
 
     working["ticker"] = ticker.upper()
 

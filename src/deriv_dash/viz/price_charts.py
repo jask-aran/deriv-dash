@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
-def make_price_chart(prices_matrix: pd.DataFrame, title: str, log_y: bool = False) -> go.Figure:
+def make_price_chart(prices_matrix: pd.DataFrame, title: str, log_y: bool = False, show_markers: bool = False) -> go.Figure:
     """Build a multi-ticker line chart from a price matrix."""
     fig = go.Figure()
 
@@ -15,19 +15,22 @@ def make_price_chart(prices_matrix: pd.DataFrame, title: str, log_y: bool = Fals
         fig.update_layout(title=title, template="plotly_white")
         return fig
 
+    mode = "lines+markers" if show_markers else "lines"
+    
     for ticker in prices_matrix.columns:
         fig.add_trace(
             go.Scatter(
                 x=prices_matrix.index,
                 y=prices_matrix[ticker],
-                mode="lines",
+                mode=mode,
                 name=str(ticker),
+                marker=dict(size=4) if show_markers else None
             )
         )
 
     fig.update_layout(
         title=title,
-        xaxis_title="Date",
+        xaxis_title="Time",
         yaxis_title="Price",
         hovermode="x unified",
         template="plotly_white",

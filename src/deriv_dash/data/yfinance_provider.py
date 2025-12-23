@@ -40,6 +40,7 @@ class YFinancePricesProvider(PricesProvider):
                 end=query.end,
                 interval=query.interval,
                 auto_adjust=query.auto_adjust,
+                prepost=query.include_extended,
                 group_by="ticker",
                 progress=False,
                 threads=True,
